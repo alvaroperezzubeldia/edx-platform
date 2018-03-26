@@ -187,10 +187,11 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.assertFalse(consent_needed_for_course(request, user, 'fake-course'))
 
     @httpretty.activate
-    def test_consent_needed_for_courses(self):
+    @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')
+    def test_consent_needed_for_courses(self, mock_catalog_contains_course):
+        mock_catalog_contains_course.return_value = True
         user = UserFactory()
         enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
-        enterprise_customer_user.enterprise_customer.catalog_contains_course = mock.Mock(return_value=True)
 
         course_id = 'fake-course'
         data_sharing_consent = DataSharingConsent(
